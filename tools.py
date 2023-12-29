@@ -66,9 +66,6 @@ class Editor(QMainWindow):
             elif self.opened_file_extension == 'pdf':
                 self.pdf_file = open(file_name, 'rb')
                 self.pdf_reader = PyPDF2.PdfReader(self.pdf_file)
-                # for page_num in range(len(pdf_reader.pages)):
-                #     page = pdf_reader.pages[page_num]
-                #     self.content += page.extract_text()
 
 
     def save_file(self):
@@ -104,8 +101,6 @@ class Editor(QMainWindow):
                 pdf_writer = PyPDF2.PdfWriter()
 
                 # Add pages to the writer
-                # pdf_reader = PyPDF2.PdfReader(self.content)
-
                 for page_num in range(len(self.pdf_reader.pages)):
                     page = self.pdf_reader.pages[page_num]
                     pdf_writer.add_page(page)
