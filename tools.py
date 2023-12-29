@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QPushButto
 from pptx import Presentation
 from docx import Document
 import PyPDF2
-
+import chardet
 class Editor(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -41,8 +41,15 @@ class Editor(QMainWindow):
             self.opened_file_extension = file_name.split('.')[-1].lower()
 
             if self.opened_file_extension == 'txt':
-                with open(file_name, 'r') as file:
-                    self.content = file.read()
+                with open(file_name, 'rb') as file:
+                    result = chardet.detect(file.read())
+                    encoding = result['encoding']
+                with open(file_name, 'r', encoding=encoding) as file:
+                    try:
+                        self.content = file.read()
+                    except UnicodeDecodeError:
+                        # Handle the exception or try a different encoding
+                        QMessageBox.warning(self, "Error", "Error decoding the file. Try a different encoding.")
 
             elif self.opened_file_extension == 'pptx':
                 self.presentation = Presentation(file_name)
@@ -107,7 +114,7 @@ class Editor(QMainWindow):
                 with open(output_pdf_path, 'wb') as output_file:
                     pdf_writer.write(output_file)
                 self.pdf_file.close()
-            QMessageBox.information(self, "Success", "File saved successfully.")
+                QMessageBox.information(self, "Success", "File saved successfully.")
 
         except Exception as e:
             QMessageBox.warning(self, "Error", f"An error occurred during save: {str(e)}")
