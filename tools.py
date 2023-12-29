@@ -13,7 +13,7 @@ class Editor(QMainWindow):
     def init_ui(self):
         self.central_widget = QWidget(self)
         self.setGeometry(100, 100, 200, 200)
-        self.setWindowTitle('Simple Text Editor')
+        self.setWindowTitle('读写文件')
 
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout(self.central_widget)
