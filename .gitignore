@@ -1,6 +1,6 @@
 .idea
 .vscode
-
+.venv
 *.jpg
 *.png
 *.jpeg
