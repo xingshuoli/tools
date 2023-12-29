@@ -23,7 +23,7 @@ class Editor(QMainWindow):
         self.layout.addWidget(open_button)
 
         # Save button
-        save_button = QPushButton('Save', self)
+        save_button = QPushButton('保存文件', self)
         save_button.clicked.connect(self.save_file)
         self.layout.addWidget(save_button)
 
