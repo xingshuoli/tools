@@ -18,7 +18,7 @@ class Editor(QMainWindow):
         self.layout = QVBoxLayout(self.central_widget)
 
         # Open button
-        open_button = QPushButton('Open', self)
+        open_button = QPushButton('打开文件', self)
         open_button.clicked.connect(self.open_file)
         self.layout.addWidget(open_button)
 
