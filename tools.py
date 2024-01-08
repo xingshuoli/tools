@@ -5,9 +5,12 @@ from docx import Document
 import PyPDF2
 import chardet
 import pandas as pd
+
+
 class Editor(QMainWindow):
     def __init__(self):
         super().__init__()
+        # self.excel_data = {}
         self.init_ui()
 
     def init_ui(self):
@@ -34,8 +37,10 @@ class Editor(QMainWindow):
 
     def open_file(self):
         # Reset previous data
+
         self.reset_data()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "", "EXECL Files (*.xlsx *.xls *.csv);;Text Files (*.txt);;PPTX Files (*.pptx);;DOCX Files (*.docx);;PDF Files (*.pdf)")
+        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "",
+                                                   "EXECL Files (*.xlsx *.xls *.csv);;Text Files (*.txt);;PPTX Files (*.pptx);;DOCX Files (*.docx);;PDF Files (*.pdf)")
 
         if file_name:
             self.opened_file_extension = file_name.split('.')[-1].lower()
@@ -69,7 +74,11 @@ class Editor(QMainWindow):
 
             elif self.opened_file_extension == 'xlsx' or self.opened_file_extension == 'xls' or self.opened_file_extension == 'csv':
                 try:
-                    self.excel_data = pd.read_csv(file_name)
+
+                    if self.opened_file_extension == 'csv':
+                        self.excel_data = pd.read_csv(file_name, encoding="gbk")
+                    else:
+                        self.excel_data = pd.read_excel(file_name, sheet_name=None)
                     QMessageBox.information(self, "Success", "Excel file loaded successfully.")
                 except Exception as e:
                     QMessageBox.warning(self, "Error", f"An error occurred during Excel file loading: {str(e)}")
@@ -120,16 +129,28 @@ class Editor(QMainWindow):
             elif self.opened_file_extension in ["xlsx", "xls", "csv"]:
                 output_excel_path, _ = QFileDialog.getSaveFileName(self, "Save File", "",
                                                                    f"{self.opened_file_extension.upper()} Files (*.{self.opened_file_extension})")
-                if output_excel_path:
+                if output_excel_path.lower().endswith(".xlsx"):
+                    with pd.ExcelWriter(output_excel_path,engine="xlrd",mode="a") as writer:
+                        for sheet_name, df in self.excel_data.items():
+                            df.to_excel(writer, sheet_name=sheet_name, index=False)
+                    QMessageBox.information(self, "Success", "Excel file saved successfully.")
+                elif output_excel_path.lower().endswith(".csv"):
                     self.excel_data.to_csv(output_excel_path, index=False)
                     QMessageBox.information(self, "Success", "Excel file saved successfully.")
+                else:
+                    with pd.ExcelWriter(output_excel_path,engine="openpyxl") as writer:
+                        for sheet_name, df in self.excel_data.items():
+                            df.to_excel(writer, sheet_name=sheet_name, index=False)
+
 
         except Exception as e:
             QMessageBox.warning(self, "Error", f"An error occurred during save: {str(e)}")
+
     def reset_data(self):
         # Reset data before opening a new file
         self.opened_file_extension = None
         self.content = ""
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
